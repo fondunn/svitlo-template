@@ -1,29 +1,94 @@
 ## Getting Started
 
-### Using Docker (Recommended)
+### Setting up the .env file
 
-To start the app in development mode using Docker, follow these steps:
+Create a `.env` file in the root directory of the project with the following content:
 
-1. Make sure you have Docker and Docker Compose installed on your system.
-2. Open a terminal and navigate to the project root directory.
-3. Run the following command:
+```
+# PostgreSQL
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=myapp
 
-```bash
-docker-compose up dev
+# Prisma
+DATABASE_URL=postgresql://user:password@localhost:5432/myapp
+
+# For Docker
+DOCKER_DATABASE_URL=postgresql://user:password@db:5432/myapp
 ```
 
-This will build the Docker image (if not already built) and start the app in development mode.
+### Using Docker (Recommended)
+
+1. Make sure you have Docker and Docker Compose installed on your system.
+2. Run the following command to start the application and PostgreSQL database:
+
+```bash
+docker-compose up
+```
+
+3. The application will be available at http://localhost:3000
 
 ### Without Docker
 
-Alternatively, you can run the development server without Docker:
+1. Make sure you have PostgreSQL installed and running on your system.
+2. Update the `DATABASE_URL` in the `.env` file to match your local PostgreSQL configuration.
+3. Install dependencies:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
+```
+
+4. Run the development server:
+
+```bash
+pnpm run dev
+```
+
+5. The application will be available at http://localhost:3000
+
+### Setting up Prisma with PostgreSQL
+
+1. Install Prisma CLI as a development dependency:
+
+```bash
+pnpm add -D prisma
+```
+
+2. Initialize Prisma in your project:
+
+```bash
+npx prisma init
+```
+
+3. The `schema.prisma` file will be created in the `prisma` directory. Update it to use PostgreSQL:
+
+```prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Define your models here
+```
+
+4. Generate Prisma client:
+
+```bash
+npx prisma generate
+```
+
+5. Use Prisma in your application:
+
+```typescript
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+// Use prisma in your application logic
+```
+
+Remember to run migrations when you make changes to your schema:
+
+```bash
+npx prisma migrate dev
 ```
